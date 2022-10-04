@@ -3,9 +3,18 @@
 import sys
 import pygame
 import random
+
+import os
 from pygame.locals import *
 pygame.init()
 pygame.font.init()
+pygame.mixer.init() # ayy sound moment
+#defines the path to the sound files in folder 'soundfiles' as s
+s = 'soundfiles'
+#defines the two sound files used for hitting the ball and getting a goal
+hit = pygame.mixer.Sound(os.path.join(s, 'hit.wav'))
+goal = pygame.mixer.Sound(os.path.join(s, 'goal.wav'))
+
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 800
@@ -16,6 +25,7 @@ clock = pygame.time.Clock()
 pygame.joystick.init()
 joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
 
+
 for joystick in joysticks:
     print(joystick)
     joystick.init()
@@ -25,6 +35,7 @@ player2 = joysticks[1].get_name()
 
 print(player1)
 print(player2)
+
 main_font = pygame.font.SysFont("comicsans", 50)
 player_1_width = 35
 player_1_height = 200
@@ -57,14 +68,19 @@ while True:
     screen.blit(score_player_2_text, (SCREEN_WIDTH - (score_player_2_text.get_width() + 25), 25))
 
     if player_1.colliderect(ball) or player_2.colliderect(ball):
+        pygame.mixer.Sound.play(hit)
+
         motion_ball[0] *= -1
         motion_ball[1] = random.randint(-5, 5)
     if ball.y <= 0 or (ball.y + ball.height >= SCREEN_HEIGHT):
         motion_ball[1] *= -1
 
     if ball.x <= 0:
+        pygame.mixer.Sound.play(goal)
         player_2_score += 1
     if ball.x + ball.width >= SCREEN_WIDTH:
+        pygame.mixer.Sound.play(goal)
+
         player_1_score += 1
     if ball.x <= 0 or (ball.x + ball.width >= SCREEN_WIDTH):
         ball.x = (SCREEN_WIDTH / 2) - (player_1.width/2)
@@ -108,6 +124,7 @@ while True:
         player_2.y += motion_player_2[1] * 10
 
     for event in pygame.event.get():
+
         if (event.type == JOYAXISMOTION) and (event.axis == 0 or event.axis == 1) and (event.instance_id == 0):
             if event.axis < 2:
                 print(event.instance_id)
