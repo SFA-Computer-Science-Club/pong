@@ -3,6 +3,7 @@
 import sys
 import pygame
 import random
+
 import os
 from pygame.locals import *
 pygame.init()
@@ -23,6 +24,17 @@ clock = pygame.time.Clock()
 
 pygame.joystick.init()
 joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+
+
+for joystick in joysticks:
+    print(joystick)
+    joystick.init()
+    
+player1 = joysticks[0].get_name()
+player2 = joysticks[1].get_name()
+
+print(player1)
+print(player2)
 
 main_font = pygame.font.SysFont("comicsans", 50)
 player_1_width = 35
@@ -57,6 +69,7 @@ while True:
 
     if player_1.colliderect(ball) or player_2.colliderect(ball):
         pygame.mixer.Sound.play(hit)
+
         motion_ball[0] *= -1
         motion_ball[1] = random.randint(-5, 5)
     if ball.y <= 0 or (ball.y + ball.height >= SCREEN_HEIGHT):
@@ -67,6 +80,7 @@ while True:
         player_2_score += 1
     if ball.x + ball.width >= SCREEN_WIDTH:
         pygame.mixer.Sound.play(goal)
+
         player_1_score += 1
     if ball.x <= 0 or (ball.x + ball.width >= SCREEN_WIDTH):
         ball.x = (SCREEN_WIDTH / 2) - (player_1.width/2)
@@ -110,12 +124,15 @@ while True:
         player_2.y += motion_player_2[1] * 10
 
     for event in pygame.event.get():
-        if (event.type == JOYAXISMOTION) and (event.axis == 0 or event.axis == 1):
+
+        if (event.type == JOYAXISMOTION) and (event.axis == 0 or event.axis == 1) and (event.instance_id == 0):
             if event.axis < 2:
+                print(event.instance_id)
                 motion_player_1[event.axis] = event.value
-        if (event.type == JOYAXISMOTION) and (event.axis == 2 or event.axis == 3):
-            if event.axis < 4:
-                motion_player_2[event.axis - 2] = event.value
+        if (event.type == JOYAXISMOTION) and (event.axis == 0 or event.axis == 1) and (event.instance_id == 1):
+            if event.axis < 2:
+                print(event.instance_id)
+                motion_player_2[event.axis] = event.value
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
